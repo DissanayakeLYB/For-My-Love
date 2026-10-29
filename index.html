@@ -21,6 +21,7 @@
     body {
       margin: 0;
       min-height: 100vh;
+      min-height: 100svh;
       padding: 26px 16px 32px;
       color: var(--ink);
       font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
@@ -31,9 +32,11 @@
       display: flex;
       justify-content: center;
       align-items: flex-start;
+      -webkit-text-size-adjust: 100%;
     }
 
     button, label { font: inherit; }
+    button { -webkit-tap-highlight-color: transparent; }
     .page { width: min(840px, 100%); margin: auto; }
     .heading { text-align: center; padding: 8px 10px 18px; }
     .eyebrow {
@@ -257,7 +260,10 @@
     }
 
     /* The page starts with only the playful drag prompt and our two fixed photos. */
-    body { align-items: center; padding: 20px 14px; }
+    body {
+      align-items: center;
+      padding: max(20px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    }
     .page { width: min(760px, 100%); margin: auto; }
     .scene { height: clamp(330px, 58vh, 470px); min-height: 330px; }
     .scene-note { top: 19px; font-size: .82rem; color: #9c7180; }
@@ -271,7 +277,7 @@
     .message-overlay {
       position: fixed; inset: 0; z-index: 100;
       display: none; align-items: center; justify-content: center;
-      padding: 20px;
+      padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
       background: rgba(74, 39, 54, .28);
       -webkit-backdrop-filter: blur(3px);
       backdrop-filter: blur(3px);
@@ -279,7 +285,9 @@
     .message-overlay.is-open { display: flex; animation: overlay-in 220ms ease both; }
     .popup-card {
       position: relative; width: min(540px, 100%); max-height: min(78vh, 650px);
-      overflow-y: auto; padding: clamp(25px, 5vw, 38px) clamp(20px, 5vw, 35px) 24px;
+      max-height: min(78svh, 650px);
+      overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: clamp(25px, 5vw, 38px) clamp(20px, 5vw, 35px) 24px;
       border: 1px solid rgba(255,255,255,.98); border-radius: 27px;
       text-align: center; background: rgba(255, 251, 250, .97);
       box-shadow: 0 24px 85px rgba(94, 40, 62, .28), inset 0 1px 0 white;
@@ -292,21 +300,22 @@
       text-wrap: pretty;
     }
     .one-more-button {
-      margin-top: 23px; min-height: 39px; padding: 0 18px;
-      border: 1px solid rgba(192, 93, 127, .22); border-radius: 99px;
-      background: linear-gradient(135deg, #e58aa6, #cf668b); color: #fff;
-      font-size: .89rem; font-weight: 800; letter-spacing: .01em; cursor: pointer;
-      box-shadow: 0 7px 16px rgba(193, 78, 118, .19);
+      margin-top: 23px; min-height: 44px; max-width: 100%; padding: 0 20px;
+      border: 1px solid rgba(192, 93, 127, .35); border-radius: 99px;
+      background: rgba(255, 255, 255, .75); color: var(--rose-deep);
+      font-size: .88rem; font-weight: 600; letter-spacing: .01em; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(193, 78, 118, .1);
       transition: transform 160ms ease, box-shadow 160ms ease;
     }
-    .one-more-button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(193, 78, 118, .25); }
+    .one-more-button:hover { transform: translateY(-1px); background: #fff; box-shadow: 0 7px 16px rgba(193, 78, 118, .16); }
     .one-more-button:active { transform: scale(.98); }
+    .one-more-button:focus-visible { outline: 3px solid rgba(214, 106, 142, .3); outline-offset: 3px; }
     @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popup-in { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
     @media (max-width: 430px) {
-      body { padding: 12px 10px; }
-      .scene { height: min(62vh, 430px); min-height: 315px; border-radius: 24px; }
+      body { padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left)); }
+      .scene { height: min(62svh, 430px); min-height: 315px; border-radius: 24px; }
       .person { --size: clamp(104px, 29vw, 130px); }
       .popup-card { border-radius: 23px; }
     }
@@ -341,7 +350,7 @@
     <section class="popup-card" role="dialog" aria-modal="true" aria-label="A loving message from Pooh bear">
       <p class="popup-heart" aria-hidden="true">🧸 💗</p>
       <p class="message" id="message" aria-live="polite"></p>
-      <button class="one-more-button" id="oneMoreButton" type="button">one more hug? 💞</button>
+      <button class="one-more-button" id="oneMoreButton" type="button">drag for another hug ↺</button>
     </section>
   </div>
 
@@ -531,17 +540,16 @@
         revealTimer = window.setTimeout(openMessage, reduceMotion ? 30 : 620);
       }
 
-      function repeatHug() {
-        if (!hugging) return;
-        // Keep the photos cuddled together; replay the squeeze and reveal a fresh note.
-        message.textContent = randomMessage();
+      function returnToDragPage() {
+        clearTimeout(revealTimer);
         scene.classList.remove('hugging');
         messageOverlay.classList.remove('is-open');
-        void scene.offsetWidth;
-        scene.classList.add('hugging');
-        createHeartBurst();
-        void messageOverlay.offsetWidth;
-        messageOverlay.classList.add('is-open');
+        messageOverlay.setAttribute('aria-hidden', 'true');
+        heartBurst.replaceChildren();
+        sceneNote.textContent = 'Psst… drag either of us closer 💞';
+        hugging = false;
+        resetPositions(false);
+        window.requestAnimationFrame(() => you.focus({ preventScroll: true }));
       }
 
       function beginDrag(event, person) {
@@ -598,7 +606,7 @@
         });
       });
 
-      oneMoreButton.addEventListener('click', repeatHug);
+      oneMoreButton.addEventListener('click', returnToDragPage);
       window.addEventListener('resize', () => {
         if (!hugging && !activeDrag) resetPositions(false);
       });
