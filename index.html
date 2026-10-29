@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#fff5f4" />
+  <title>For My Sudu Bole 💗</title>
+  <style>
+    :root {
+      --ink: #46343d;
+      --muted: #8b737d;
+      --rose: #df7895;
+      --rose-deep: #bc5277;
+      --cream: #fffaf6;
+      --blush: #fff0f2;
+      --line: rgba(155, 91, 113, .14);
+    }
+
+    * { box-sizing: border-box; }
+    html { min-height: 100%; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      padding: 26px 16px 32px;
+      color: var(--ink);
+      font-family: ui-rounded, "Avenir Next", Avenir, "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(ellipse at 8% 10%, rgba(255, 210, 220, .58), transparent 34%),
+        radial-gradient(ellipse at 92% 12%, rgba(255, 226, 194, .55), transparent 30%),
+        linear-gradient(150deg, #fff8f4 0%, #fff0f4 54%, #fff9f1 100%);
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    button, label { font: inherit; }
+    .page { width: min(840px, 100%); margin: auto; }
+    .heading { text-align: center; padding: 8px 10px 18px; }
+    .eyebrow {
+      margin: 0 0 10px;
+      color: var(--rose-deep);
+      font-size: .72rem;
+      font-weight: 800;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(2.5rem, 7vw, 4.3rem);
+      line-height: 1.04;
+      font-weight: 500;
+      letter-spacing: -.045em;
+    }
+    h1 em { color: var(--rose-deep); font-weight: 500; }
+    .intro {
+      max-width: 490px;
+      margin: 13px auto 0;
+      color: var(--muted);
+      font-size: .98rem;
+      line-height: 1.65;
+    }
+
+    .scene {
+      isolation: isolate;
+      position: relative;
+      height: clamp(300px, 46vh, 390px);
+      min-height: 300px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 30px;
+      background:
+        radial-gradient(ellipse at 50% 48%, rgba(255,255,255,.96), rgba(255,248,246,.84) 47%, rgba(255,229,235,.78) 100%);
+      box-shadow: 0 18px 55px rgba(160, 94, 116, .12), inset 0 1px 0 #fff;
+    }
+    .scene::before, .scene::after {
+      content: "♡";
+      position: absolute;
+      color: rgba(213, 116, 148, .22);
+      font-family: Georgia, serif;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .scene::before { font-size: 70px; top: 23px; left: 8%; transform: rotate(-15deg); }
+    .scene::after { content: "✦"; font-size: 30px; bottom: 28px; right: 10%; color: rgba(221, 165, 111, .4); }
+
+    .scene-note {
+      position: absolute;
+      z-index: 1;
+      top: 20px;
+      left: 12px;
+      right: 12px;
+      text-align: center;
+      color: #a1848d;
+      font-size: .77rem;
+      letter-spacing: .015em;
+      pointer-events: none;
+    }
+    .person {
+      --size: clamp(106px, 22vw, 150px);
+      position: absolute;
+      z-index: 3;
+      width: var(--size);
+      height: var(--size);
+      left: 0;
+      top: 50%;
+      padding: 0;
+      border: 5px solid rgba(255,255,255,.98);
+      border-radius: 50%;
+      background: #ffe3e9;
+      box-shadow: 0 9px 25px rgba(150, 76, 104, .2), 0 0 0 1px rgba(222, 142, 165, .14);
+      transform: translate(-50%, -50%);
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: left 720ms cubic-bezier(.2,.85,.25,1.22), top 720ms cubic-bezier(.2,.85,.25,1.22), transform 720ms cubic-bezier(.2,.85,.25,1.22), box-shadow 250ms ease;
+      outline: none;
+    }
+    .person:focus-visible { box-shadow: 0 0 0 4px rgba(214, 106, 142, .25), 0 9px 25px rgba(150, 76, 104, .2); }
+    .person.is-moving {
+      z-index: 6;
+      cursor: grabbing;
+      transition: none;
+      box-shadow: 0 15px 30px rgba(150, 76, 104, .28), 0 0 0 5px rgba(255,255,255,.5);
+    }
+    .person-inner { width: 100%; height: 100%; border-radius: 50%; overflow: hidden; position: relative; }
+    .person.is-moving .person-inner { animation: running-bob 170ms ease-in-out infinite alternate; }
+    .person img { display: none; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
+    .person.has-photo img { display: block; }
+    .placeholder {
+      width: 100%; height: 100%; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 3px;
+      background: linear-gradient(145deg, #ffe9ed, #fbd0dd);
+      color: #9c5a73;
+    }
+    .her .placeholder { background: linear-gradient(145deg, #fff0d9, #ffdbe4); }
+    .person.has-photo .placeholder { display: none; }
+    .placeholder .emoji { font-size: clamp(2.7rem, 7vw, 4rem); line-height: 1.08; filter: drop-shadow(0 3px 1px rgba(131,72,91,.1)); }
+    .placeholder .short-name { font-size: .61rem; font-weight: 800; letter-spacing: .13em; }
+    .person-tag {
+      position: absolute;
+      z-index: 7;
+      top: calc(50% + clamp(72px, 14vw, 88px));
+      min-width: 82px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 30px;
+      background: rgba(255,255,255,.84);
+      color: #8a596b;
+      font-size: .75rem;
+      font-weight: 750;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(154, 91, 116, .08);
+      pointer-events: none;
+      transform: translateX(-50%);
+      transition: left 720ms cubic-bezier(.2,.85,.25,1.22), top 720ms ease, opacity 200ms ease;
+      white-space: nowrap;
+    }
+    .hug-arms {
+      display: none;
+      position: absolute;
+      z-index: 5;
+      left: 50%; top: calc(50% + 32px);
+      width: 170px; height: 75px;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+    .hug-arms::before, .hug-arms::after {
+      content: ""; position: absolute; top: 0; width: 92px; height: 50px;
+      border: 10px solid #e88ba7; border-top-color: transparent;
+      border-radius: 0 0 48px 48px;
+      filter: drop-shadow(0 2px 1px rgba(142, 71, 96, .09));
+    }
+    .hug-arms::before { left: 0; transform: rotate(12deg); }
+    .hug-arms::after { right: 0; transform: rotate(-12deg); border-color: #d86e91; border-top-color: transparent; }
+    .scene.hugging .hug-arms { display: block; animation: arms-pop 520ms cubic-bezier(.2,1.35,.4,1) both; }
+    .scene.hugging .person { box-shadow: 0 10px 27px rgba(150, 76, 104, .2), 0 0 0 4px rgba(255,255,255,.7); }
+    .scene.hugging .you { z-index: 3; }
+    .scene.hugging .her { z-index: 4; }
+    .scene.hugging .person-tag { opacity: 0; }
+    .scene.hugging .you .person-inner { animation: rush-left 720ms cubic-bezier(.2,.85,.25,1.1) both; }
+    .scene.hugging .her .person-inner { animation: rush-right 720ms cubic-bezier(.2,.85,.25,1.1) both; }
+
+    .heart-burst { position: absolute; z-index: 8; left: 50%; top: 50%; pointer-events: none; }
+    .burst-heart {
+      position: absolute; left: 0; top: 0; font-size: var(--heart-size, 21px);
+      animation: heart-float 1250ms ease-out var(--delay, 0ms) both;
+      filter: drop-shadow(0 2px 2px rgba(160, 71, 103, .12));
+    }
+    .scene.hugging .scene-note { color: #b36581; font-weight: 700; }
+    @keyframes running-bob { from { transform: translateY(-2px) rotate(-2deg); } to { transform: translateY(3px) rotate(2deg); } }
+    @keyframes rush-left { 0% { transform: scale(.88) rotate(-12deg); } 35% { transform: scale(1.06) rotate(7deg); } 70% { transform: scale(.98) rotate(-4deg); } 100% { transform: scale(1.03) rotate(-2deg); } }
+    @keyframes rush-right { 0% { transform: scale(.88) rotate(12deg); } 35% { transform: scale(1.06) rotate(-7deg); } 70% { transform: scale(.98) rotate(4deg); } 100% { transform: scale(1.03) rotate(2deg); } }
+    @keyframes arms-pop { 0% { opacity: 0; transform: translateX(-50%) scale(.45); } 80% { opacity: 1; transform: translateX(-50%) scale(1.08); } 100% { opacity: 1; transform: translateX(-50%) scale(1); } }
+    @keyframes heart-float {
+      0% { opacity: 0; transform: translate(-50%, 10px) scale(.45) rotate(-10deg); }
+      18% { opacity: 1; }
+      100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), var(--dy)) scale(1.2) rotate(18deg); }
+    }
+
+    .controls { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 10px; margin: 17px 0 14px; }
+    .bring-button {
+      min-height: 49px; padding: 0 23px; border: 0; border-radius: 99px;
+      background: linear-gradient(135deg, #d96e91, #c75880); color: white;
+      font-weight: 800; letter-spacing: .01em; cursor: pointer;
+      box-shadow: 0 9px 20px rgba(193, 78, 118, .22);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+    .bring-button:hover { transform: translateY(-2px); box-shadow: 0 12px 24px rgba(193, 78, 118, .27); }
+    .bring-button:active { transform: translateY(1px) scale(.99); }
+    .photo-label {
+      display: inline-flex; justify-content: center; align-items: center; gap: 7px;
+      min-height: 44px; padding: 0 15px; border: 1px solid rgba(196, 132, 151, .28);
+      border-radius: 99px; background: rgba(255,255,255,.68); color: #936477;
+      font-size: .84rem; font-weight: 700; cursor: pointer;
+      transition: background 160ms ease, transform 160ms ease;
+    }
+    .photo-label:hover { background: #fff; transform: translateY(-1px); }
+    input[type="file"] { display: none; }
+    .tiny-help { text-align: center; color: #a58b95; font-size: .76rem; margin: 0 0 19px; }
+
+    .message-card {
+      position: relative; padding: 22px clamp(18px, 5vw, 38px) 23px;
+      background: rgba(255,255,255,.76); border: 1px solid rgba(255,255,255,.96);
+      border-radius: 24px; text-align: center;
+      box-shadow: 0 12px 35px rgba(160, 94, 116, .085);
+      min-height: 145px;
+    }
+    .message-kicker { margin: 0 0 9px; color: #c26b89; font-size: .68rem; font-weight: 850; letter-spacing: .18em; text-transform: uppercase; }
+    .message {
+      margin: 0 auto; max-width: 680px; font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.15rem, 3.1vw, 1.55rem); line-height: 1.52; color: #5b3f4a;
+      text-wrap: pretty;
+    }
+    .message-card.revealed .message { animation: message-in 500ms ease both; }
+    @keyframes message-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }
+    .signature { margin: 13px 0 0; color: #ab7a8d; font-size: .83rem; font-weight: 650; }
+    .closing { margin: 17px 8px 0; text-align: center; color: #a1848d; font-size: .83rem; line-height: 1.6; }
+    .closing span { color: #cc688b; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @media (max-width: 430px) {
+      body { padding: 17px 11px 24px; }
+      .heading { padding-bottom: 15px; }
+      .intro { font-size: .9rem; }
+      .scene { border-radius: 24px; height: 320px; }
+      .person { --size: clamp(100px, 27vw, 125px); }
+      .person-tag { top: calc(50% + 68px); }
+      .controls { gap: 8px; }
+      .photo-label { min-height: 41px; padding: 0 12px; font-size: .79rem; }
+      .bring-button { min-height: 46px; padding: 0 19px; }
+      .message-card { border-radius: 21px; padding-top: 20px; padding-bottom: 20px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
+    }
+
+    /* The page starts with only the playful drag prompt and our two fixed photos. */
+    body { align-items: center; padding: 20px 14px; }
+    .page { width: min(760px, 100%); margin: auto; }
+    .scene { height: clamp(330px, 58vh, 470px); min-height: 330px; }
+    .scene-note { top: 19px; font-size: .82rem; color: #9c7180; }
+    .person { transition: left 720ms cubic-bezier(.2,.85,.25,1.22), top 720ms cubic-bezier(.2,.85,.25,1.22), transform 720ms cubic-bezier(.2,.85,.25,1.22), box-shadow 250ms ease; }
+    .person img { display: none; }
+    .person.has-photo img { display: block; }
+    .person.has-photo .placeholder { display: none; }
+    .scene.hugging .person { pointer-events: none; }
+    .scene.hugging .scene-note { color: #b36581; font-weight: 800; }
+
+    .message-overlay {
+      position: fixed; inset: 0; z-index: 100;
+      display: none; align-items: center; justify-content: center;
+      padding: 20px;
+      background: rgba(74, 39, 54, .28);
+      -webkit-backdrop-filter: blur(3px);
+      backdrop-filter: blur(3px);
+    }
+    .message-overlay.is-open { display: flex; animation: overlay-in 220ms ease both; }
+    .popup-card {
+      position: relative; width: min(540px, 100%); max-height: min(78vh, 650px);
+      overflow-y: auto; padding: clamp(25px, 5vw, 38px) clamp(20px, 5vw, 35px) 24px;
+      border: 1px solid rgba(255,255,255,.98); border-radius: 27px;
+      text-align: center; background: rgba(255, 251, 250, .97);
+      box-shadow: 0 24px 85px rgba(94, 40, 62, .28), inset 0 1px 0 white;
+      animation: popup-in 420ms cubic-bezier(.2,.95,.3,1.15) both;
+    }
+    .popup-heart { margin: 0 0 13px; font-size: 1.55rem; line-height: 1; }
+    .message {
+      margin: 0 auto; max-width: 460px; font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.1rem, 3.1vw, 1.38rem); line-height: 1.62; color: #5b3f4a;
+      text-wrap: pretty;
+    }
+    .one-more-button {
+      margin-top: 23px; min-height: 39px; padding: 0 18px;
+      border: 1px solid rgba(192, 93, 127, .22); border-radius: 99px;
+      background: linear-gradient(135deg, #e58aa6, #cf668b); color: #fff;
+      font-size: .89rem; font-weight: 800; letter-spacing: .01em; cursor: pointer;
+      box-shadow: 0 7px 16px rgba(193, 78, 118, .19);
+      transition: transform 160ms ease, box-shadow 160ms ease;
+    }
+    .one-more-button:hover { transform: translateY(-1px); box-shadow: 0 10px 20px rgba(193, 78, 118, .25); }
+    .one-more-button:active { transform: scale(.98); }
+    @keyframes overlay-in { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes popup-in { from { opacity: 0; transform: translateY(12px) scale(.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+    @media (max-width: 430px) {
+      body { padding: 12px 10px; }
+      .scene { height: min(62vh, 430px); min-height: 315px; border-radius: 24px; }
+      .person { --size: clamp(104px, 29vw, 130px); }
+      .popup-card { border-radius: 23px; }
+    }
+
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="scene" id="scene" aria-label="Drag either photo toward the other to make us hug">
+      <div class="scene-note" id="sceneNote">Psst… drag either of us closer 💞</div>
+
+      <div class="person you" id="you" role="button" tabindex="0" aria-label="Pooh bear. Drag me toward Sudu bole." title="Drag me toward Sudu bole">
+        <div class="person-inner">
+          <div class="placeholder"><span class="emoji" aria-hidden="true">🧸</span><span class="short-name">POOH</span></div>
+          <img src="images/pooh.jpg" alt="Pooh bear" draggable="false" />
+        </div>
+      </div>
+
+      <div class="person her" id="her" role="button" tabindex="0" aria-label="Sudu bole. Drag me toward Pooh bear." title="Drag me toward Pooh bear">
+        <div class="person-inner">
+          <div class="placeholder"><span class="emoji" aria-hidden="true">💗</span><span class="short-name">SUDU</span></div>
+          <img src="images/sudu.jpeg" alt="Sudu bole" draggable="false" />
+        </div>
+      </div>
+
+      <div class="hug-arms" aria-hidden="true"></div>
+      <div class="heart-burst" id="heartBurst" aria-hidden="true"></div>
+    </section>
+  </main>
+
+  <div class="message-overlay" id="messageOverlay" aria-hidden="true">
+    <section class="popup-card" role="dialog" aria-modal="true" aria-label="A loving message from Pooh bear">
+      <p class="popup-heart" aria-hidden="true">🧸 💗</p>
+      <p class="message" id="message" aria-live="polite"></p>
+      <button class="one-more-button" id="oneMoreButton" type="button">one more hug? 💞</button>
+    </section>
+  </div>
+
+  <script>
+    (() => {
+      const scene = document.getElementById('scene');
+      const you = document.getElementById('you');
+      const her = document.getElementById('her');
+      const sceneNote = document.getElementById('sceneNote');
+      const heartBurst = document.getElementById('heartBurst');
+      const message = document.getElementById('message');
+      const messageOverlay = document.getElementById('messageOverlay');
+      const oneMoreButton = document.getElementById('oneMoreButton');
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      const messages = [
+        "I might not always know the perfect words to comfort you, my love, but I never want you to go through the hard days alone. Whenever life feels heavy, remember that I'll be right here, offering you both my hands and all my heart.",
+        "My brave girl, you spend so much of yourself trying your best. You don't have to earn my love by being strong. You are loved when you're winning, when you're tired, when you're quiet, and when all you need is a cuddle.",
+        "You can put the whole world down for a little while, baby. You don't have to solve everything tonight. Come close, take a breath, and let yourself be cared for too.",
+        "I wish I could wrap my arms around you right now and remind you that this hard moment is only one small part of your beautiful story. I'm proud of you, and I'm here with you.",
+        "You are allowed to have bad days, my love. They don't make you any less capable, beautiful, or incredible. You are a human being with a heart that deserves gentleness, too.",
+        "If today has been unkind to you, let me be a little softness at the end of it. No fixing, no explaining, no pretending you're okay. Just you and me, and a hug that lasts as long as you need.",
+        "I hope you see yourself through my eyes one day, someone so determined, so thoughtful, and so wonderfully worth loving. Even on the days you doubt yourself, that doesn't change.",
+        "You don't need to carry every worry on your own shoulders, sweetheart. Tell me about it, cry if you need to, or say nothing at all. I can sit beside you through any of it.",
+        "My favourite girl, your worth isn't measured by how much you finish, how well you perform, or how much you endure. You matter simply because you're you. That will always be enough for me.",
+        "I can't promise that every day will be easy, but I can promise that you won't have to face every difficult day feeling alone. I'll keep showing up, one day and one hug at a time.",
+        "Baby, even the moon has phases and still remains beautiful. You can have quieter days, tired days, tearful days, and still be the amazing woman I adore.",
+        "When your mind tells you that you're not doing enough, I hope you remember how much you've already overcome. Please be as patient with yourself as you are with everyone you love.",
+        "Come here, little love. Let the world wait a minute. I want to hold you close enough that you remember you are safe to soften, safe to rest, and safe to be completely yourself with me.",
+        "I'm proud of how hard you work, but I'm even more grateful for the person you are beyond all that hard work. I love the you who rests, laughs, dreams, and needs a little extra affection.",
+        "You never have to hide your sadness from me to protect my happiness. Your feelings aren't a burden, my love. I want to understand you, even when I can't immediately make things better.",
+        "One difficult day does not erase all your progress. One mistake doesn't define you. One setback doesn't decide your future. Take a breath, baby. We can take the next little step when you're ready.",
+        "I hope this message feels like my arms around you, warm, steady, and reminding you that you don't have to be perfect to be deeply loved.",
+        "You give so much effort to the things that matter to you. Please save a little tenderness for yourself, too. You deserve the same kindness you give the people around you.",
+        "If I could give you one thing right now, it would be a tiny pause from every worry and a long, quiet hug that reminds you how loved you are. Since I can't always do that instantly, here's a little piece of my heart.",
+        "Baby, you can be strong and still need reassurance. You can be independent and still want to be held. Those things don't contradict each other. I love every side of you.",
+        "I don't need you to turn every painful thing into a lesson straight away. Sometimes it is enough to get through the day, drink some water, breathe, and let someone love you.",
+        "Whenever you feel like you are falling behind, remember that your path doesn't need to look like anyone else's. I'm cheering for you—not only for where you're going, but for who you are right now.",
+        "I wish I could kiss the worry off your forehead and tell your tired heart to rest. Until then, imagine me holding you close and reminding you, you're doing better than you think, my love.",
+        "You are not difficult to love just because you have difficult feelings. You never need to apologise for being human with me. I would rather know the real you than see you pretend to be okay.",
+        "My girl, I hope you remember to celebrate the quiet victories, trying again, showing up, asking for help, or simply making it through a tough day. Those things count, and I'm proud of you.",
+        "No matter how busy life gets, I want to keep making room for your little needs, a long cuddle, a forehead kiss, a silly joke, or someone who listens without rushing you.",
+        "If today didn't go the way you hoped, please don't turn that disappointment against yourself. You're learning, growing, and doing your best with what you had today. That's worthy of compassion.",
+        "My love, you don't have to be the one who holds everything together every single time. Sometimes you get to be the one who is held. Let me have that privilege.",
+        "There is no deadline for feeling better, sweetheart. Take the time you need. I'll never ask you to rush your heart just because the world is in a hurry.",
+        "I love your ambition, but I also love your sleepy face, your silly side, your softness, your little moods, and the part of you that just wants to be someone's baby for a while.",
+        "When everything feels tangled, let's handle only the next small thing. You don't need the whole plan right now. You only need a little space to breathe, and maybe my hand in yours.",
+        "I hope you never confuse being exhausted with being incapable. You may simply need rest, comfort, and a moment away from the pressure. You are still every bit as wonderful.",
+        "You have made it through days you once thought would be too much. Look at you, still here, still trying. I hope you give yourself credit for that, because I certainly do.",
+        "I can't take every worry away from you, but I can listen, learn what helps, and stand beside you. I want to be your partner in the hard parts, not just the happy pictures.",
+        "A little reminder from your person, your feelings matter, your dreams matter, and your rest matters. You do not have to shrink any part of yourself to deserve care.",
+        "You are allowed to change your mind, take a break, start over, or ask for a hand. None of that makes you weak. It means you're taking care of the precious person you are.",
+        "Whenever you forget how special you are, borrow my belief in you for a little while. I'll remind you as many times as you need, until you can feel it for yourself again.",
+        "I love being someone you can lean on. You don't have to have everything figured out before you come to me. Bring me the messy thoughts, the worries, and the quiet little sadness too.",
+        "Your best is not supposed to look the same every day, baby. Some days your best is running forward; some days it's resting without giving up. Both are brave.",
+        "If today made you feel unseen, please know that I see you. I see the effort nobody claps for, the things you worry about in silence, and the heart behind everything you do.",
+        "I hope we build a love where you never have to be impressive to be cherished. You can come to me with no achievements, no answers, and no smile—and still be my favourite person.",
+        "You deserve more than someone who admires your strength. You deserve someone who notices when you're tired and helps you find a place to rest. I want to keep learning how to be that for you.",
+        "Take my hand, love. We don't have to solve your entire world this minute. Let's just be here, together, and let this moment be gentle.",
+        "Even if I can't find the right thing to say, my love for you is still here. I can listen, hold you, learn from you, and keep trying. You never have to face a hard moment perfectly.",
+        "You are allowed to feel proud of yourself and overwhelmed at the same time. You're allowed to want big things and need a nap. You're allowed to be a strong woman and my cuddly little baby.",
+        "Please remember that progress is often quiet. The work you do when nobody sees it still matters. Keep going at a pace that leaves room for your own heart, too.",
+        "If all you can do tonight is curl up and let me love you, that's enough. No productivity points, no pressure, no need to explain. Just breathe, sweetheart.",
+        "I hope tomorrow feels lighter. And if it doesn't, we'll meet that day one step at a time. You don't need to borrow tomorrow's worries tonight, my love.",
+        "Thank you for letting me love the soft parts of you, not only the capable parts everyone else sees. I treasure your trust, your tenderness, and every chance to make you feel cared for.",
+        "Whatever happened today, it doesn't change how grateful I am that you exist. In a world full of people, I get to love you—and that is one of my favourite things.",
+        "I wish I could put a little note in your pocket that says, drink some water, unclench your jaw, breathe slowly, and remember that someone is completely in your corner.",
+        "You don't have to make yourself smaller when you're hurting or pretend to be cheerful for me. I want the honest version of you, even when she needs extra hugs.",
+        "My love, you are allowed to receive care without feeling guilty about it. Let somebody make things a little easier for you sometimes. You deserve that softness, too.",
+        "When you look back at this season, I hope you remember not only how hard you worked, but also how you learned to be gentle with yourself along the way.",
+        "I am not in love with a version of you who never struggles. I'm in love with you—the real, growing, feeling, trying person—and I want to keep choosing you through ordinary days and difficult ones.",
+        "Let's make a little home in each other's arms, a place where the day can be put down and you can just be. No need to be brave for these few minutes, baby.",
+        "You bring so much light into my life, even when you don't feel especially bright yourself. You don't have to shine for me all the time. I love you in the quiet, too.",
+        "Remember this, my brave girl, asking for a hug is not asking for too much. Needing reassurance is not a flaw. Letting someone care for you is not a weakness.",
+        "I hope you talk to yourself today as gently as you would talk to a friend you adore. You deserve your own kindness, especially when things aren't going perfectly.",
+        "Whatever is waiting for you outside this little moment, right now you have permission to pause. Imagine my arms around you, my cheek against your head, and nowhere else you need to be.",
+        "On the days you feel like you aren't enough, let me remind you that you have never needed to prove your worth to be loved by me. You're already precious to me, exactly as you are.",
+        "My favourite future is not one where you never get tired or sad. It's one where we keep finding our way back to each other, learning how to listen better, care better, and hug a little longer."
+      ];
+
+      const openings = [
+        'Sudu bole, remember this, ',
+        'Mage Manika, keep this close to your heart, ',
+        'Sudu Manika, I need you to remember, ',
+        'My Rattaran, a little reminder from your Pooh, ',
+        'Sudu, read this as a cuddle from me, ',
+        'Love, your Pooh wants you to remember, ',
+        'Baby, let your Pooh remind you, ',
+        'Patiyoo, a little hug in words, '
+      ];
+      const endings = [
+        ' Aadarei, mage Sudu Manika. Always, your Pooh bear 🧸💗',
+        ' Your Pooh is right here for you, baby. Aadarei. 💗',
+        ' Aadarei, Mage Manika. Come back for another cuddle whenever you need one. 🧸',
+        ' Always your Pooh bear, my Sudu bole. Aadarei. 💞',
+        ' Aadarei, Rattaran. You never have to face everything alone. - your loving Pooh 🧸',
+        ' Your Pooh loves every part of you. Aadarei, Sudu. 💗',
+        ' Aadarei, Patiyoo. Let your Pooh hold you a little longer. 🧸💞',
+        ' Forever your Pooh, my Love. Aadarei. 💗'
+      ];
+
+      let positions = { you: { x: 0, y: 0 }, her: { x: 0, y: 0 } };
+      let previousMessage = -1;
+      let hugging = false;
+      let activeDrag = null;
+      let startPoint = null;
+      let revealTimer = null;
+
+      function setPersonPosition(person, x, y) {
+        const item = positions[person.id];
+        item.x = x;
+        item.y = y;
+        person.style.left = `${x}px`;
+        person.style.top = `${y}px`;
+      }
+
+      function resetPositions(animate = true) {
+        if (!animate) {
+          you.style.transition = 'none';
+          her.style.transition = 'none';
+        }
+        const width = scene.clientWidth;
+        const height = scene.clientHeight;
+        setPersonPosition(you, Math.max(you.offsetWidth / 2 + 8, width * .22), height * .51);
+        setPersonPosition(her, Math.min(width - her.offsetWidth / 2 - 8, width * .78), height * .51);
+        if (!animate) {
+          requestAnimationFrame(() => {
+            you.style.transition = '';
+            her.style.transition = '';
+          });
+        }
+      }
+
+      function randomIndexExceptPrevious(length) {
+        let next = Math.floor(Math.random() * length);
+        while (length > 1 && next === previousMessage) next = Math.floor(Math.random() * length);
+        previousMessage = next;
+        return next;
+      }
+
+      function randomMessage() {
+        const next = randomIndexExceptPrevious(messages.length);
+        const opening = openings[Math.floor(Math.random() * openings.length)];
+        const ending = endings[Math.floor(Math.random() * endings.length)];
+        return `${opening}${messages[next]}${ending}`;
+      }
+
+      function createHeartBurst() {
+        heartBurst.replaceChildren();
+        const hearts = ['♡', '♥', '💕', '♡', '✦', '💗', '♥', '♡', '✨', '💕', '♡', '♥'];
+        hearts.forEach((symbol, index) => {
+          const heart = document.createElement('span');
+          heart.className = 'burst-heart';
+          heart.textContent = symbol;
+          heart.style.setProperty('--dx', `${Math.round((Math.random() - .5) * 245)}px`);
+          heart.style.setProperty('--dy', `${-70 - Math.round(Math.random() * 140)}px`);
+          heart.style.setProperty('--delay', `${index * 38}ms`);
+          heart.style.setProperty('--heart-size', `${14 + Math.round(Math.random() * 14)}px`);
+          heartBurst.appendChild(heart);
+        });
+      }
+
+      function openMessage() {
+        message.textContent = randomMessage();
+        messageOverlay.classList.add('is-open');
+        messageOverlay.setAttribute('aria-hidden', 'false');
+        oneMoreButton.focus({ preventScroll: true });
+      }
+
+      function startHug() {
+        if (hugging) return;
+        hugging = true;
+        clearTimeout(revealTimer);
+        you.classList.remove('is-moving');
+        her.classList.remove('is-moving');
+        activeDrag = null;
+        scene.classList.add('hugging');
+        sceneNote.textContent = 'There you are, Sudu bole 💗';
+
+        const centerX = scene.clientWidth / 2;
+        const centerY = scene.clientHeight * .51;
+        setPersonPosition(you, centerX - Math.min(27, you.offsetWidth * .20), centerY);
+        setPersonPosition(her, centerX + Math.min(27, her.offsetWidth * .20), centerY - 2);
+        createHeartBurst();
+
+        // Let the two photos finish their running-in animation before revealing the note.
+        revealTimer = window.setTimeout(openMessage, reduceMotion ? 30 : 620);
+      }
+
+      function repeatHug() {
+        if (!hugging) return;
+        // Keep the photos cuddled together; replay the squeeze and reveal a fresh note.
+        message.textContent = randomMessage();
+        scene.classList.remove('hugging');
+        messageOverlay.classList.remove('is-open');
+        void scene.offsetWidth;
+        scene.classList.add('hugging');
+        createHeartBurst();
+        void messageOverlay.offsetWidth;
+        messageOverlay.classList.add('is-open');
+      }
+
+      function beginDrag(event, person) {
+        if (hugging || event.button > 0) return;
+        event.preventDefault();
+        activeDrag = person;
+        const rect = scene.getBoundingClientRect();
+        startPoint = { x: event.clientX, y: event.clientY, moved: false };
+        const current = positions[person.id];
+        person.dragOffsetX = event.clientX - rect.left - current.x;
+        person.dragOffsetY = event.clientY - rect.top - current.y;
+        person.classList.add('is-moving');
+        try { person.setPointerCapture(event.pointerId); } catch (_) {}
+      }
+
+      function moveDrag(event, person) {
+        if (activeDrag !== person || hugging) return;
+        const rect = scene.getBoundingClientRect();
+        if (startPoint && Math.hypot(event.clientX - startPoint.x, event.clientY - startPoint.y) > 4) startPoint.moved = true;
+        const radius = person.offsetWidth / 2;
+        const x = Math.max(radius, Math.min(scene.clientWidth - radius, event.clientX - rect.left - person.dragOffsetX));
+        const y = Math.max(radius + 20, Math.min(scene.clientHeight - radius - 8, event.clientY - rect.top - person.dragOffsetY));
+        setPersonPosition(person, x, y);
+      }
+
+      function endDrag(event, person) {
+        if (activeDrag !== person) return;
+        person.classList.remove('is-moving');
+        const other = person === you ? her : you;
+        const a = positions[person.id];
+        const b = positions[other.id];
+        const closeEnough = Math.hypot(a.x - b.x, a.y - b.y) < (person.offsetWidth + other.offsetWidth) * .43;
+        activeDrag = null;
+        if (closeEnough && startPoint && startPoint.moved) startHug();
+        startPoint = null;
+      }
+
+      [you, her].forEach(person => {
+        // Fixed local image files: images/pooh.jpg and images/sudu.jpeg.
+        const image = person.querySelector('img');
+        const showPhoto = () => person.classList.add('has-photo');
+        image.addEventListener('load', showPhoto);
+        if (image.complete && image.naturalWidth > 0) showPhoto();
+
+        person.addEventListener('pointerdown', event => beginDrag(event, person));
+        person.addEventListener('pointermove', event => moveDrag(event, person));
+        person.addEventListener('pointerup', event => endDrag(event, person));
+        person.addEventListener('pointercancel', event => endDrag(event, person));
+        person.addEventListener('keydown', event => {
+          if ((event.key === 'Enter' || event.key === ' ') && !hugging) {
+            event.preventDefault();
+            startHug();
+          }
+        });
+      });
+
+      oneMoreButton.addEventListener('click', repeatHug);
+      window.addEventListener('resize', () => {
+        if (!hugging && !activeDrag) resetPositions(false);
+      });
+
+      resetPositions(false);
+    })();
+  </script>
+</body>
+</html>
